@@ -3,14 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCurriculoRequest;
-use Illuminate\Http\Request;
-
 use App\Models\Curriculo;
 use Illuminate\Support\Facades\Http;
-use Mail;
-use App\Mail\SendMail;
-use Illuminate\Support\Facades\Mail as FacadesMail;
-use Illuminate\Support\Facades\Storage;
+
 
 class EventController extends Controller
 {
@@ -21,13 +16,9 @@ class EventController extends Controller
      */
     public function store(StoreCurriculoRequest $request)
     {
-        $nameFile = md5(time().rand(0, 1000)).'.'.$request->arquivo->extension();
-        $caminho = 'app/storage/app/curriculo/'.$nameFile;
-        $request->file('arquivo')->storeAs('curriculo', $nameFile);
-        
-        $ip = $this->getIp();
+        $array_dados    =  $this->saveFile($request);        
+        $ip             = $this->getIp();
 
-        //dd(storage_path('app/curriculo/'.$nameFile));
         
         $curriculo = new Curriculo;
         $curriculo->nome            = $request->nome;
@@ -36,36 +27,31 @@ class EventController extends Controller
         $curriculo->cargo           = $request->cargo;
         $curriculo->escolaridade    = $request->escolaridade;
         $curriculo->observacao      = $request->observacao ?? '';
-        $curriculo->arquivo         = $caminho;
+        $curriculo->arquivo         = $array_dados['caminho'];
         $curriculo->ip              = $ip;
         $curriculo->save();
-        
-        $this->sendMail($curriculo, $nameFile);
+
+        $sendCurriculo = new SendCurriculo($curriculo, $array_dados['nameFile']);
+        $sendCurriculo->sendMail();
+
         return redirect('/')->with('success', 'Currículo enviado com sucesso!');
     }
 
 
     /**
-     * Método para enviar email
+     * Método para guardar o anexo na pasta currículo
      */
-
-    public function sendMail($dadosCurriculo, $nameFile)
+    public function saveFile($request)
     {
-        $data = array(
-            'nome'          => $dadosCurriculo->nome,
-            'email'         => $dadosCurriculo->email,
-            'telefone'      => $dadosCurriculo->telefone,
-            'cargo'         => $dadosCurriculo->cargo,
-            'escolaridade'  => $dadosCurriculo->escolaridade,
-            'observacao'    => $dadosCurriculo->observacao,
-            'ip'            => $dadosCurriculo->ip,
-            'nameFile'      => $nameFile 
-        );
+        
 
-        FacadesMail::to( config('mail.from.address'))
-            ->send( new SendMail($data));
+        $nameFile   = md5(time().rand(0, 1000)).'.'.$request->arquivo->extension();
+        $caminho    = 'app/storage/app/curriculo/'.$nameFile;
+        $request->file('arquivo')->storeAs('curriculo', $nameFile);
         
+        $array_dados_arquivo = ['nameFile' => $nameFile, 'caminho' => $caminho];
         
+        return $array_dados_arquivo;
     }
 
     /**
