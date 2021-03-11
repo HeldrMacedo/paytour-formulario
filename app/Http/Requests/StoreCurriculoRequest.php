@@ -31,7 +31,7 @@ class StoreCurriculoRequest extends FormRequest
             'telefone'      => 'required',
             'cargo'         => 'required',
             'escolaridade'  => 'required',
-            'arquivo'       => ['required', new Arquivo, new ArquivoTipo],
+            'arquivo'       => ['required', 'mimes:doc,docx,pdf', 'max: 1000'],
         ];
     }
 
@@ -44,6 +44,8 @@ class StoreCurriculoRequest extends FormRequest
             'cargo.required' => 'O campo cargo desejado é obrigatório.',
             'escolaridade.required' => 'O campo escolaridade é obrigatório.',
             'arquivo.required' => 'O campo arquivo é obrigatório.',
+            'arquivo.mimes' => 'Somente arquivos com as extensões: .doc, .docx ou .pdf',
+            'arquivo.max' => 'O tamanho máximo do arquivo é de 1MB'
         ];
     }
 }

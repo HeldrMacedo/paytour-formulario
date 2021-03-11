@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use phpDocumentor\Reflection\Types\Nullable;
 
 class CreateCurriculoTable extends Migration
 {
@@ -21,7 +22,7 @@ class CreateCurriculoTable extends Migration
             $table->string('telefone');
             $table->string('cargo');
             $table->string('escolaridade');
-            $table->text('observacao');
+            $table->text('observacao')->nullable();
             $table->string('arquivo');
             $table->string('ip', 20);
         });

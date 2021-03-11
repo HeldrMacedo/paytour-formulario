@@ -1,13 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Jobs;
 
-use App\Mail\SendMail;
+use App\Mail\SendCurriculoNotification;
 use App\Models\Curriculo;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail as FacadesMail;
 
-class SendCurriculo extends Controller
+class SendCurriculo implements ShouldQueue
 {
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     private $nome;
     private $email;
     private $telefone;
@@ -17,7 +25,6 @@ class SendCurriculo extends Controller
     private $ip;
     private $nameFile;
 
-   
     public function __construct(Curriculo $curriculo, $nameFile)
     {
         $this->nome         = $curriculo->nome;         
@@ -30,11 +37,12 @@ class SendCurriculo extends Controller
         $this->nameFile     = $nameFile;
     }
 
-     /**
-     * Método para enviar email
+    /**
+     * Execute the job.
+     *
+     * @return void
      */
-
-    public function sendMail()
+    public function handle()
     {
         $data = array(
             'nome'          => $this->nome,
@@ -47,11 +55,9 @@ class SendCurriculo extends Controller
             'nameFile'      => $this->nameFile 
         );
 
-        $enviarEmail = new SendMail($data);
+        $enviarEmail = new SendCurriculoNotification($data);
 
-        FacadesMail::to( config('mail.from.address'))
+        FacadesMail::to( 'helder.macedo@outlook.com')
             ->send( $enviarEmail );
-        
-        
     }
 }

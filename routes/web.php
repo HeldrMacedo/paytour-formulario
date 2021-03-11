@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CurriculumController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,12 +13,12 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-use App\Http\Controllers\EventController;
+
 
 Route::get('/', function () {
     return view('layout/main');
 });
 
-Route::post('/enviar', [EventController::class, 'store']);
+Route::post('/enviar', [CurriculumController::class, 'store']);
 
 
