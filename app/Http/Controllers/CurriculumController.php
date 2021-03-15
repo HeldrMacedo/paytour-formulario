@@ -3,15 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCurriculoRequest;
-use App\Jobs\SendCurriculo;
 use App\Models\Curriculo;
-use Illuminate\Http\Client\Request;
-use Illuminate\Support\Facades\Http;
 
 
 class CurriculumController extends Controller
 {
-    
+
     /**
      * Método que recebe os dados do formulário
      * 
@@ -20,7 +17,7 @@ class CurriculumController extends Controller
     {
         $array_dados    =  $this->saveFile($request);
 
-        
+
         $curriculo = new Curriculo();
         $curriculo->fill($request->all());
         $curriculo->ip          = $request->ip();
@@ -38,13 +35,12 @@ class CurriculumController extends Controller
      */
     public function saveFile($request)
     {
-        $nameFile   = md5(time().rand(0, 1000)).'.'.$request->arquivo->extension();
-        $caminho    = 'app/storage/app/curriculo/'.$nameFile;
+        $nameFile   = md5(time() . rand(0, 1000)) . '.' . $request->arquivo->extension();
+        $caminho    = 'curriculo/' . $nameFile;
         $request->file('arquivo')->storeAs('curriculo', $nameFile);
-        
+
         $array_dados_arquivo = ['nameFile' => $nameFile, 'caminho' => $caminho];
-        
+
         return $array_dados_arquivo;
     }
-
 }
